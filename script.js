@@ -218,21 +218,14 @@ document.querySelectorAll('.view-project').forEach(link => {
     });
 });
 
-// Add loading animation
-window.addEventListener('load', () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s ease';
-        document.body.style.opacity = '1';
-    }, 100);
-});
-
 // Stats Counter Animation
 const stats = document.querySelectorAll('.stat-number');
+const animatedStats = new Set();
 
 function animateCounter(element) {
     const target = element.textContent;
-    const number = parseInt(target);
+    const number = parseInt(target.replace('+', ''));
+    const hasPlus = target.includes('+');
     const increment = number / 50;
     let current = 0;
     
@@ -242,14 +235,15 @@ function animateCounter(element) {
             element.textContent = target;
             clearInterval(timer);
         } else {
-            element.textContent = Math.floor(current) + '+';
+            element.textContent = Math.floor(current) + (hasPlus ? '+' : '');
         }
     }, 30);
 }
 
 const statsObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !animatedStats.has(entry.target)) {
+            animatedStats.add(entry.target);
             animateCounter(entry.target);
             statsObserver.unobserve(entry.target);
         }
